@@ -1,0 +1,137 @@
+[
+	{
+		"model": "space.Configs",
+		"pk": 1,
+		"fields": {
+			"key": "lbhost",
+			"value": "lbmanager.mmt.com",
+			"is_expression": false
+		}
+	},
+	{
+		"model": "space.Configs",
+		"pk": 2,
+		"fields": {
+			"key": "lbuser",
+			"value": "edge",
+			"is_expression": false
+		}
+	},
+	{
+		"model": "space.Configs",
+		"pk": 3,
+		"fields": {
+			"key": "lbtimeout",
+			"value": 60,
+			"is_expression": false
+		}
+	},
+	{
+		"model": "space.Configs",
+		"pk": 4,
+		"fields": {
+			"key": "es_host",
+			"value": "lbmanager.mmt.com:9200",
+			"is_expression": false
+		}
+	},
+	{
+		"model": "space.Configs",
+		"pk": 5,
+		"fields": {
+			"key": "es_timeout",
+			"value": 5,
+			"is_expression": false
+		}
+	},
+	{
+		"model": "space.Configs",
+		"pk": 6,
+		"fields": {
+			"key": "es_retries",
+			"value": 2,
+			"is_expression": false
+		}
+	},
+	{
+		"model": "space.Configs",
+		"pk": 7,
+		"fields": {
+			"key": "es_index",
+			"value": "__import__('datetime').datetime.now().strftime('edge-basic-%Y-%m-%d')",
+			"is_expression": true
+		}
+	},
+	{
+		"model": "space.Configs",
+		"pk": 8,
+		"fields": {
+			"key": "es_detail_index",
+			"value": "__import__('datetime').datetime.now().strftime('edge-detail-%Y-%m-%d')",
+			"is_expression": true
+		}
+	},
+	{
+		"model": "space.Configs",
+		"pk": 9,
+		"fields": {
+			"key": "es_read_index",
+			"value": "edge-basic-*",
+			"is_expression": false
+		}
+	},
+	{
+		"model": "space.Configs",
+		"pk": 10,
+		"fields": {
+			"key": "es_read_detail_index",
+			"value": "edge-detail-*",
+			"is_expression": false
+		}
+	},
+	{
+		"model": "space.Configs",
+		"pk": 11,
+		"fields": {
+			"key": "member_session_wait_time",
+			"value": 300,
+			"is_expression": false
+		}
+	},
+	{
+		"model": "space.Configs",
+		"pk": 12,
+		"fields": {
+			"key": "zone_ip_prefix",
+			"value": "{ 'DC1' : '', 'DC2' : '', 'DC3' : '' }",
+			"is_expression": true
+		}
+	},
+	{
+		"model": "space.Configs",
+		"pk": 13,
+		"fields": {
+			"key": "staggered_batch_config",
+			"value": "{ '0' : 'Others', '1' : '100%', '2' : '50%,100%' , '4': '25%,50%,100%' , '8' : '10%,25%,50%,100%' }",
+			"is_expression": true
+		}
+	},
+	{
+		"model": "space.Configs",
+		"pk": 14,
+		"fields": {
+			"key": "es_read_count",
+			"value": "1000",
+			"is_expression": true
+		}
+	},
+	{
+		"model": "space.Configs",
+		"pk": 15,
+		"fields": {
+			"key": "bizeye_url",
+			"value": "{'DC1':'<FTP_SERVER>','DC2':'<FTP_SERVER>'}",
+			"is_expression": true
+		}
+	}
+]

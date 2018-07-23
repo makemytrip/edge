@@ -1,0 +1,18 @@
+[
+	{
+		"model": "space.Plan",
+		"pk": 1,
+		"fields": {
+			"name": "restart",
+			"method_list": "['stop', 'start']"
+		}
+	},
+	{
+		"model": "space.Plan",
+		"pk": 2,
+		"fields": {
+			"name": "deploy",
+			"method_list": "['stop', 'start']"
+		}
+	}
+]

@@ -1,0 +1,17 @@
+Django==1.11.1
+elasticsearch==5.0.1
+requests==2.9.1
+python-ldap==2.4.32
+django-auth-ldap==1.2.10
+boto3==1.4.4
+MySQL-python==1.2.5
+Fabric==1.13.2
+djangorestframework==3.6.3
+django-simple-history==1.9.0
+extras==1.0.0
+celery==4.1.1
+isort==4.2.15
+flake8==3.5.0
+jira==1.0.10
+python-consul==0.7.0
+jinja2==2.8

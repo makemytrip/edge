@@ -1,0 +1,22 @@
+[
+{
+  "model": "space.project",
+  "pk": 1,
+  "fields": {
+    "name": "project1",
+    "space": 2,
+    "env": 1,
+    "config": "{}"
+  }
+},
+{
+  "model": "space.project",
+  "pk": 2,
+  "fields": {
+    "name": "project2",
+    "space": 1,
+    "env": 2,
+    "config": "{}"
+  }
+}
+]

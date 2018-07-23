@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html >
+{% load static %}
+<head>
+
+<meta charset="UTF-8">
+    <title>{% block title %} Edge {% endblock %}</title>
+
+    {% block meta %}
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% endblock %}
+    {% block css %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <link rel="stylesheet" href="{% static 'css/themes/bootstrap.min.css' %}" />
+    {% endblock %}
+
+    {% block javascript %}
+    <script type="text/javascript" src="{% static 'js/jquery-3.2.1.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
+    
+    <script type="text/javascript" src="{% static 'js/typeit.js' %}"></script>
+    {% endblock %}
+
+<style>
+body{
+    background: #9B5B40; /* For browsers that do not support gradients */
+    background: url('{% static 'images/bg-pattern.png' %}'), linear-gradient(to left, #03434d, #000000); /* Standard syntax (must be last) */
+    color: white;
+    font-family: tahoma;
+}
+</style>
+</head>
+<body>
+    <!-- Navigation -->
+   <nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#"><img src="{% static 'images/EDGE.png' %}" style="margin-top: -30%;margin-left: -6%;"></a>
+    </div>
+     <ul class="nav navbar-nav navbar-right">
+      <a class="navbar-brand" href="/space/doc/readme/" style="color: white;"><li style="font-size: 18px;text-color: white;"><span class="glyphicon glyphicon-book"></span>&nbsp;&nbsp;DOCS</a></li>
+     <li style="font-size: 18px;text-color: white;margin-top: 10px;  data-toggle="tooltip" data-placement="bottom" title="Gradient Left""><input type="color" id="colorWell1" class="cinput" />&nbsp;</li>
+      <li style="font-size: 18px;text-color: white;margin-top: 10px;  data-toggle="tooltip" data-placement="bottom" title="Gradient Right""><input type="color" id="colorWell" class="cinput" />&nbsp;</li>
+     <li style="font-size: 18px;text-color: white;margin-top: 10px; data-toggle="tooltip" data-placement="bottom" title="One color""><input type="color" id="colorWell2" class="cinput" />&nbsp;&nbsp;</li>
+
+    </ul>
+  </div>
+</nav>
+
+<div class="container-fluid" style="margin-top: 7%;">
+<div class="row">
+	<div class="col-md-6">
+         <p id="example1" style="padding-top: 6%;padding-left: 6%;font-size: 28px;"></p>
+	</div>
+	<div class="col-md-3 col-md-offset-2">
+       <form class="form-signin" accept-charset="UTF-8" role="form" method="post">       
+      <h2 class="form-signin-heading hd" style="text-align: center;">User Login</h2>
+      <input name="user_id" type="text" tabindex="1" class="form-control fontf" placeholder="User ID" required="" autofocus="" />
+      <br>
+      <input class="form-control" placeholder="Password" name="password" type="password" tabindex="2" required=""/>
+      <br>      
+      <button class="btn btn-lg btn-primary btn-block" type="submit" value="login"><span class="fontf">LOGIN</span></button>  
+      <p style="position: relative;">
+        {% if error %}
+	       <div class="alert alert-success" role="alert">
+		{% if error.message %}
+		  {{ error.message|upper }}
+		{% endif %}
+		{% if not error.message %}
+		  {{ error|upper }}
+		{% endif %}
+	       </div>
+		{% endif %}
+		{% if msg %}
+	       <div class="alert alert-info" role="alert">
+		{{ msg|upper }}
+	       </div>
+        {% endif %}
+
+        {% block body %} {% endblock %}
+    </div>
+	</p> 
+  </form>
+</div>
+
+    </div>
+<script>
+$(document).ready(function(){
+    $('[data-toggle="popover"]').popover();   
+});
+
+$('#example1').typeIt({
+     speed: 80,
+     autoStart: true,
+     loop: true,
+     deleteDelay: 70,
+     lifeLike: true
+})
+.tiType('Edge is an automation framework that deploys over Web Applications')
+.tiPause(500)
+.tiDelete(16)
+.tiSettings({speed: 80})
+.tiType('Micro Services ')
+.tiPause(500)
+.tiDelete(15)
+.tiType('Topologies over DataCenter ')
+.tiPause(500)
+.tiDelete(27)
+.tiType('Apache Storm ')
+.tiPause(500)
+.tiDelete(13)
+.tiType('Openstack')
+.tiPause(500)
+.tiDelete()
+.tiType('Edge is an automation framework that can deploy Web Applications, Micro Services, Topologies over DataCenter, AWS, Apache Storm, & Openstack ..')
+.tiPause(5000)
+
+// Select colors
+var colorWell;
+var colorWell1;
+var colorWell2;
+if(localStorage.getItem("color") == null){
+   var defaultColor = " #03434d";
+   var defaultColor1 = "#000000";
+   var defaultColor2 = "#000fff";
+}
+else{
+  var defaultColor = localStorage.getItem("color");
+  var defaultColor1 = localStorage.getItem("color1");
+  var defaultColor2 = localStorage.getItem("color2");
+}
+var c = null;
+var m = null;
+var bdy = document.querySelector("body");
+window.addEventListener("load", startup, false);
+function startup() {
+  colorWell = document.querySelector("#colorWell");
+  colorWell1 = document.querySelector("#colorWell1");
+  colorWell2 = document.querySelector("#colorWell2");
+  if(localStorage.getItem("color") == null){
+    colorWell.value = "#03434d";
+    colorWell1.value = "#000000";
+    colorWell2.value = "#000fff";
+  }
+  else{
+    colorWell.value = localStorage.getItem("color");
+    colorWell1.value = localStorage.getItem("color1");
+    colorWell2.value = localStorage.getItem("color2");
+  }
+  colorWell.addEventListener("input", updateFirst, false); 
+  colorWell2.addEventListener("input", updateFirst2, false); 
+  colorWell1.addEventListener("input", updateFirst1, false);
+  colorWell.select();
+  colorWell1.select();
+  colorWell2.select();
+}
+bdy.style.background = localStorage.getItem("background");
+function updateFirst(event) {
+  var bdy = document.querySelector("body");
+  localStorage.setItem("color",event.target.value);
+  c = event.target.value;
+  if (m != null) {
+    $(bdy).css({"background": "url('{% static 'images/bg-pattern.png' %}'), linear-gradient(to left, "+event.target.value+", "+m+")"});
+    localStorage.setItem("background", "{% static 'images/bg-pattern.png' %}, linear-gradient(to left, "+event.target.value+", "+m+")");
+  } 
+  else{
+    $(bdy).css({"background": "url('{% static 'images/bg-pattern.png' %}'), linear-gradient(to left, "+event.target.value+", "+defaultColor1+")"});
+    localStorage.setItem("background", "url('{% static 'images/bg-pattern.png' %}'), linear-gradient(to left, "+event.target.value+", "+defaultColor1+")");
+}
+}
+function updateFirst1(event) {
+  localStorage.setItem("color1",event.target.value);
+  var bdy = document.querySelector("body");
+  m = event.target.value;
+  if (c != null) {
+    $(bdy).css({"background": "url('{% static 'images/bg-pattern.png' %}'), linear-gradient(to left, "+c+", "+event.target.value+")"});
+    localStorage.setItem("background", "{% static 'images/bg-pattern.png' %}, linear-gradient(to left, "+c+", "+event.target.value+")");
+  }
+  else{
+    $(bdy).css({"background": "url('{% static 'images/bg-pattern.png' %}'), linear-gradient(to left,"+defaultColor+" , "+event.target.value+")"});
+    localStorage.setItem("background", "url('{% static 'images/bg-pattern.png' %}'), linear-gradient(to left, "+defaultColor+", "+event.target.value+")");
+}
+
+}
+function updateFirst2(event) {
+  localStorage.setItem("color2",event.target.value);
+  var bdy = document.querySelector("body");
+  $(bdy).css({"background": "url('{% static 'images/bg-pattern.png' %}'), linear-gradient(to left,"+event.target.value+", "+event.target.value+")"});
+  localStorage.setItem("background", "url('{% static 'images/bg-pattern.png' %}'), linear-gradient(to left,"+event.target.value+", "+event.target.value+")");
+
+}
+
+</script>
+</body>
+</html>

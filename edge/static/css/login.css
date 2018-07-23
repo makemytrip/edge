@@ -1,0 +1,76 @@
+.navbar{
+    background-color: transparent;
+    border: none;   
+}
+.lead{
+    font-size: 25px;
+    padding-left: 20px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.hd{
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.form-signin {
+  padding: 15px 35px 45px;
+  margin: 0 auto;
+  height: 370px;
+  width: 375px;
+  background-color:  linear-gradient(#c94b4b, #4b134f);
+  box-shadow: 7px 5px 70px black;
+}
+.form-signin-heading{
+	  margin-bottom: 30px;
+          color: white;
+	}
+
+.form-control {
+	  position: relative;
+	  font-size: 16px;
+	  height: auto;
+	  padding: 10px;
+	}
+
+input[type="text"] {
+	  margin-bottom: -1px;
+	  border-bottom-left-radius: 2;
+	  border-bottom-right-radius: 2;
+	}
+
+input[type="password"] {
+	  margin-bottom: 20px;
+	  border-top-left-radius: 2;
+	  border-top-right-radius: 2;
+	}
+}
+
+.ab{
+       background-color:  linear-gradient(#c94b4b, #4b134f);
+       box-shadow: 7px 5px 70px black;
+}
+a{
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+#example1{
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;"
+}
+.fontf{
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;"
+}
+input[type="color"] {
+	-webkit-appearance: none;
+	border: none;
+	width: 35px;
+        background:transparent;
+	height: 30px;
+        cursor: pointer;
+        
+}
+input[type="color"]::-webkit-color-swatch-wrapper {
+	padding: 0;
+}
+input[type="color"]::-webkit-color-swatch {
+	border: none;
+}
+.cinput{
+   cursor: pointer;
+}

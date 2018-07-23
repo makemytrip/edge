@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block active_space %}menu-select{% endblock %}
+
+{% block customcss %}
+.edge-nav-color {
+    background: -moz-linear-gradient(right,{{space.nav_color}} 20%,#ffffff) fixed no-repeat 0 100%;
+    background: {{space.nav_color}};
+}
+{% endblock %}
+
+{% block body %}
+    <div class="col-md-12">
+        {% if space %}
+        {% with request.session.space_permissions|get_item:space.name|get_item:'admin' as is_admin %}
+            <h3>{{ space|title }} <small> Total # of projects: {{ space_project|length }} </small>
+                <div class="btn-toolbar pull-right" role="toolbar" aria-label="nav_button">
+                    {% if is_admin %}
+                    <div class="btn-group" role="group" aria-label="dash_button">
+                        <a class="btn btn-sm btn-default" href="/space/wizard/space/{{ space.id }}/" role="button">
+                            <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+                            Edit Space
+                        </a>
+                    </div>
+                    {% endif %}
+                    <div class="btn-group" role="group" aria-label="dash_button">
+                        <a class="btn btn-sm btn-default" href="/space/action/{{ space.name }}/" role="button">
+                            <span class="glyphicon glyphicon-equalizer" aria-hidden="true"></span>
+                            Action: {{ space.name|title }}
+                        </a>
+                    </div>
+                    <div class="btn-group" role="group" aria-label="dash_button">
+                        <a class="btn btn-sm btn-default" href="/report/{{ space.name }}/" role="button">
+                            <span class="glyphicon glyphicon-level-up" aria-hidden="true"></span>
+                            Report: {{ space.name|title }}
+                        </a>
+                    </div>
+                    <div class="btn-group" role="group" aria-label="dash_button">
+                        <input type="text" id="dash_search" class="form-control input-sm" placeholder="Search here"/>
+                    </div>
+                </div>
+            </h3>
+            {% if space_project|length > 0 %}
+            <table id="projects_table" class="table table-bordered table-responsive">
+                <thead>
+                <tr>
+                    <th> Name </th>
+                    <th> Version </th>
+                    <th> FQDN </th>
+                    <th> Plan </th>
+                    <th> Env. </th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for project in space_project %}
+                <tr>
+                    <td>
+                        {{ project.name }}
+                    </td>
+                    <td> {{ project.config_dict|get_item:'version' }} </td>
+                    <td> {{ project.config_dict|get_item:'fqdn' }} </td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-primary btn-xs dropdown-toggle" type="button" data-toggle="dropdown"><b>Plan</b>
+                            <span class="caret"></span></button>
+                            <ul class="dropdown-menu" style="border: 1px solid gray;">
+                                {% for action in action_list %}
+                                    {% if action in hard_plans %}
+                                        {% if request.user.is_superuser %}
+                                            <li><a id="action_btn" class="btn btn-xs" href="/space/{{ space }}/{{ project.name }}/{{ action }}" role="button" style="font-size: 14px;">{{ action|title|replace_char }}</a></li>
+                                        {% endif %}
+                                    {% else %}
+                                        <li><a id="action_btn" class="btn btn-xs" href="/space/{{ space }}/{{ project.name }}/{{ action }}" role="button" style="font-size: 14px;">{{ action|title|replace_char }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </td>
+                    <td>
+                         <div class="dropdown">
+                            <button class="btn btn-success btn-xs dropdown-toggle" type="button" data-toggle="dropdown">
+                            <b>Configs</b>
+                            <span class="caret"></span></button>
+                            <ul class="dropdown-menu" style="border: 1px solid gray;left: -50%;">
+                            {% if request.user.is_superuser %}
+                                <li><a class="btn btn-xs" href="/space/wizard/env/{{ project.env.id }}" role="button" style="font-size: 17px;border-bottom:1px solid gray;">{{ project.env.name }}</a></li>
+                            {% else %}
+                                <li><a class="btn btn-xs" role="button" href="#" style="font-size: 17px;border-bottom:1px solid gray;">{{ project.env.name }}</a></li>
+                            {% endif %}
+                            <li><a class="btn btn-xs btn-default" data-toggle="modal" data-target="#{{ project }}_default" role="button" style="padding: 2px;margin: 3px;border:none;font-size: 14px;">View Project</a></li>
+                            {% if request.user.is_superuser or is_admin %}
+                                <li><a class="btn btn-xs btn-default" href="/space/wizard/project/{{ project.id }}" role="button" style="padding: 2px;margin: 3px;border: none;font-size: 14px;"">Edit Project</a></li>
+                            {% endif %}
+                            </ul>
+                            </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+            {% if space_project|length == 0 %}
+                <p class="lead"> No project mapped to this space</p>
+            {% endif %}
+        {% endwith %}
+        </div>
+        {% for project in space_project %}
+            <div class="modal fade" id="{{ project }}_default" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="myModalLabel">{{ project|title }}: Configs</h5>
+                        </div>
+                        <div class="modal-body">
+                            <pre>{{ project.total_config_dict|get_json }}</pre>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $('#projects_table').DataTable({
+                    "processing": false,
+                    "paging": false,
+                    "ordering": true,
+                    "autoFill": true,
+                    "search": {
+                        "regex": true,
+                        "smart": false
+                    },
+                    "dom": 'lrtip'
+                });
+                $('#dash_search').on('keyup', smart_search);
+                function smart_search(){
+                    var search_value = $('#dash_search').val();
+                    $('#projects_table').DataTable().search(search_value).draw();
+                }
+            });
+        </script>
+    {% endif %}
+    {% if not space %}
+        <p class="lead">Total # of spaces configured {{ space_count }} + some fancy graphs</p>
+    {% endif %}
+{% endblock %}

@@ -206,7 +206,7 @@ Response
 
 ```json
 {
-	"action_id": <task_id>,
+	"action_id": "task_id",
 	"project": "project_name"
 }
 ```

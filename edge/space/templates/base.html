@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+{% load static %}
+{% load space_tags %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %} Edge {% endblock %}</title>
+
+    {% block meta %}
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% endblock %}
+    {% block css %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'css/edge.css' %}">
+    <link rel="stylesheet" href="{% static 'css/alertify.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/themes/bootstrap.min.css' %}" />
+    <link href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/bootstrap-multiselect.css' %}" />
+    {% endblock %}
+
+    {% block javascript %}
+    <script type="text/javascript" src="{% static 'js/jquery-3.2.1.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/dataTables.bootstrap.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/alertify.min.js' %}"></script>
+    <script src="//d3js.org/d3.v3.min.js" defer></script>
+    <script type="text/javascript" src="{% static 'js/edge-1.2.js' %}" async></script>
+    <script type="text/javascript" src="{% static 'js/bootstrap-multiselect.js' %}"></script>
+    {% endblock %}
+
+   {% block customjs %} {% endblock %}
+   <style>
+    {% block customcss %}{% endblock %}
+   </style>
+</head>
+<body>
+    <nav class="navbar navbar-static-top edge-nav-color">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                    <a href="/" class="navbar-brand">
+                        <img src="{% static 'images/edge-nav.png' %}" min-width="100px" min-height="50px" style="margin-top: -15%"></img>
+                    </a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                {% if request.user %}
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle {% block active_space %}{% endblock %}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Space <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            {% for space in request.session.space_list %}
+                                <li><a href="/space/{{ space }}">{{ space|title }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle {% block active_action %}{% endblock %}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Action <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            {% for space in request.session.space_list %}
+                                <li><a href="/space/action/{{ space }}">{{ space|title }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle {% block active_report %}{% endblock %}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Report <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/report/all">All</a></li>
+                            {% for space in request.session.space_list %}
+                                <li><a href="/report/{{ space }}">{{ space|title }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                </ul>
+                {% endif %}
+                <ul class="nav navbar-nav navbar-right">
+                    {% if request.user %}
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle {% block active_wizard %}{% endblock %}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Wizard <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                {% if request.user.is_superuser %}
+                                    <li><a href="/space/wizard/env/">Env</a></li>
+                                    <li><a href="/space/wizard/space/">Space</a></li>
+                                {% endif %}
+                                <li><a href="/space/wizard/project/">Project</a></li>
+                            </ul>
+                        </li>
+                        {% if request.user.is_superuser %}
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle {% block active_wizard_env %}{% endblock %}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Env <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                {% for env in request.session.env %}
+                                    <li><a href="/space/wizard/env/{{env.id}}">{{ env.name }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        {% endif %}
+                    {% endif %}
+                    <li class="dropdown">
+                        <a href="/space/doc/readme/" target="_blank" class="dropdown-toggle" role="button">Docs</a>
+                    </li>
+                    {% if user %}
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+                            {{ user|upper }} <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            {% if request.user.is_staff %}
+                                <li><a href="/admin">Admin</a></li>
+                                <li role="separator" class="divider"></li>
+                            {% endif %}
+                            <li><a href="/space/logout">Logout</a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        {% if error %}
+            <div class="alert alert-danger" role="alert">
+                {% if error.message %}
+                    {{ error.message }}
+                {% endif %}
+                {% if not error.message %}
+                    {{ error }}
+                {% endif %}
+            </div>
+        {% endif %}
+        {% if msg %}
+            <div class="alert alert-info" role="alert">
+                {{ msg }}
+            </div>
+        {% endif %}
+
+        {% block body %} {% endblock %}
+    </div>
+
+
+    {% block postcustomjs %} {% endblock %}
+</body>
+</html>

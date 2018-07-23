@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<head>
+<style>
+p{
+        font-size: 18px;
+}
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 14px;
+}
+
+td, th {
+    border: 1px solid gray;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+</style>
+</head>
+<body>
+<p><span style="font-size: 22px;color:#02b3e4;"><b>E</span>dge</b> Report</p>
+<hr>
+<p style="font-size:14px;">Executing {{ context.action }} action, initiated by {{ context.user }} at Edge, Check status - <a href="{{ context.uri }}">{{ context.uri }}</a></p>
+<br>
+<table>
+<tr>
+<th>Server</th>
+<th>Reason</th>
+</tr>
+{% for key,value in context.items() %}
+        {% if key == 'reason' %}
+                {% for server, reason in value.items() %}
+                        <tr><td>{{ server }}</td><td>{{ reason }}</td></tr>
+                {% endfor %}
+        {% endif %}
+{% endfor %}
+</table>
+</body>
+</html>

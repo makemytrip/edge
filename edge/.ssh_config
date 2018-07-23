@@ -1,0 +1,5 @@
+# DC
+Host x.x.*
+    User edge
+    IdentityFile <Enter file path>
+

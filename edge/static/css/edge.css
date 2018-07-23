@@ -1,0 +1,108 @@
+body {
+    background-color: #fff;
+}
+
+.sidebar-nav-fixed {
+	width:14%;
+}
+
+.edge-nav-color {
+    background: -moz-linear-gradient(right,#ccc 20%,#7ee888) fixed no-repeat 0 100%;
+    background: #cfded0;
+}
+
+.basic-display {
+    padding: 1px 0px 20px;
+    color: red;
+}
+
+.basic-display .INFO {
+    color: green;
+}
+
+.basic-display .ERROR {
+    color: red;
+}
+
+.basic-display .WARN {
+    color: orange;
+}
+
+.menu-select {
+    color: #000;
+}
+
+.mark-yellow {
+    background-color: lightyellow;
+    color: black;
+}
+
+.mark-green {
+    background-color: lightgreen;
+    color: black;
+}
+
+.loader {
+	border: 6px solid #f3f3f3;
+	border-radius: 50%;
+	border-top: 6px solid blue;
+	border-right: 6px solid green;
+	border-bottom: 6px solid red;
+	width: 5px;
+	height: 5px;
+	-webkit-animation: spin 2s linear infinite;
+	animation: spin 2s linear infinite;
+}
+
+
+@-webkit-keyframes spin {
+	0% { -webkit-transform: rotate(0deg); }
+	100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
+
+/* tree graph */
+.node {
+  cursor: pointer;
+}
+
+.node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+.node text {
+  font: 10px sans-serif;
+}
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5px;
+}
+
+/*tree map*/
+
+form {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+svg {
+  font: 10px sans-serif;
+}
+#action_btn:hover{
+ box-shadow:5px 6px 6px #888888;
+ transition: 0.3s ease-in-out;
+ background-color: white;
+ color: black;
+ border: none;
+}
+
+.report {
+    font-size: 12px;
+}

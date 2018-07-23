@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+
+{% block active_action %}menu-select{% endblock %}
+
+{% block customcss %}
+.edge-nav-color {
+    background: -moz-linear-gradient(right,{{space.nav_color}} 20%,#ffffff) fixed no-repeat 0 100%;
+    background: {{space.nav_color}};
+}
+{% endblock %}
+
+{% block body %}
+
+{% with request.session.space_permissions|get_item:space.name|get_item:'admin' as is_admin %}
+{% with request.session.space_permissions|get_item:space.name|get_item:'operator' as is_operator %}
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        Action Details
+        <div class="btn-toolbar pull-right" role="toolbar" aria-label="nav_button">
+            {% if action_info_id %}
+                {% if is_operator or is_admin %}
+                <div class="btn-group" role="group" aria-label="nav_button">
+
+                    <button class="btn btn-xs btn-danger" id="revoke" onclick="_action_.revoke_action('{{ action_info_id }}');">
+                        <span class="glyphicon glyphicon-stop" aria-hidden="true"></span>
+                        Revoke Action
+                    </button>
+                </div>
+                {% endif %}
+                <div class="btn-group" role="group" aria-label="nav_button">
+                    <a class="btn btn-xs btn-default " href="/space/action/{{ space.name }}" role="button">
+                        <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+                        Back to Action
+                    </a>
+                </div>
+            {% endif %}
+            <div class="btn-group" role="group" aria-label="nav_button">
+                <a class="btn btn-xs btn-default" href="/space/{{ space.name }}" role="button">
+                    <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+                    Back to Space: {{ space.name|title }}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body">
+
+        {% if action_info_list %}
+            <table id="action_details" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Project</th>
+                        <th>Env.</th>
+                        <th>Action</th>
+                        <th>User</th>
+                        <th>Version</th>
+                        <th>Jira ID</th>
+                        <th>Configs</th>
+                        <th>Servers</th>
+                        <th>Timestamp</th>
+                        <th>Status</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                {% for action_info in action_info_list %}
+                <tr>
+                    <td>{{ action_info.id }}</td>
+                    <td>{{ action_info.project|title }}</td>
+                    <td>{{ action_info.project.env.name }}</td>
+                    <td><mark>{{ action_info.action|title|replace_char }}</mark></td>
+                    <td>{{ action_info.user.first_name }} {{ action_info.user.last_name }}</td>
+                    <td>{{ action_info.config_dict|get_item:'version' }}</td>
+                    <td>{{ action_info.config_dict|get_item:'jira_id' }}</td>
+                    <td>
+                        <button type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#{{ action_info.id }}_config">Configs</button>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#{{ action_info.id }}_servers">Servers</button>
+                    </td>
+                    <td>{{ action_info|get_action_time }}</td>
+                    <td><span id="action_status" class="label label-default">{{ action_info.status }}</span></td>
+                    <td>
+                        <a class="btn btn-xs btn-primary" href="/space/action/{{ space.name }}/{{ action_info.id }}" role="button">
+                            <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+                            Details
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+
+        {% for action_info in action_info_list %}
+            <div class="modal fade" id="{{ action_info.id }}_config" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="myModalLabel">#{{ action_info.id }}: Configs</h5>
+                        </div>
+                        <div class="modal-body">
+                            <pre>{{ action_info.config_dict|get_json }}</pre>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="{{ action_info.id }}_servers" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="myModalLabel">#{{ action_info.id }}: Server List</h5>
+                        </div>
+                        <div class="modal-body">
+                            <pre>{{ action_info.server_list|get_json }}</pre>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+        {% if action_info_id %}
+
+            <ul class="list-inline">
+                <li>Task Order</li>
+                {% for tasks in task_details %}
+                    <li><small><span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>{{ tasks|upper }}</small></li>
+                {% endfor %}
+            </ul>
+
+            <div class="progress">
+                <div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+            </div>
+
+            <div class="basic-display">
+                <ul id="basic_logs">
+                {% for entry in display %}
+                    {% for level, log in entry.items %}
+                        <li class="{{ level }}"> {{ log|safe }} </li>
+                    {% endfor %}
+                {% endfor %}
+                </ul>
+            </div>
+
+            <table id="server_details" class="table table-striped" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th width="10%">Server</th>
+                        <th>Progress</th>
+                    </tr>
+                </thead>
+            </table>
+        {% endif %}
+
+        {% if detailed_entries or basic_entries %}
+            <button data-toggle="collapse" data-target="#raw_logs">Raw logs from ES</button>
+            <div id="raw_logs" class="collapse">
+                <div class="primary">Basic Logs</div>
+                <pre>{{ basic_entries|get_json }}</pre>
+
+                <div>Detailed Logs</div>
+                <pre>{{ detailed_entries|get_json }}</pre>
+            </div>
+
+        {% endif %}
+
+    </div>
+</div>
+{% endwith %}
+{% endwith %}
+{% endblock %}
+
+
+{% block postcustomjs %}
+{% if action_info_id %}
+<script>
+    $(document).ready(function() {
+        var server_details = $('#server_details').DataTable( {
+            "ajax":{
+                'url': '',
+                "type": "POST"
+            },
+            "scrollX": true,
+            "paging": false,
+            stateSave: true,
+            "columns": [
+                {
+                    "data": "server",
+                    "width": "10%",
+                },
+                {
+                    "data": "details",
+                    "render": function(data, type, row, meta){
+                        var d = '<div class="btn-toolbar" role="toolbar" aria-label="tasks">'
+
+                        data.forEach( function (i) {
+                            var btn_status = 'btn-danger';
+                            if(Object.values(i)[0].status == true) {
+                                btn_status = 'btn-success';
+                            } else if(Object.values(i)[0].status == null) {
+                                btn_status = 'btn-warning';
+                            }
+                            d += '<div class="btn-group" role="group" aria-label="tasks">';
+                            d += '<button type="button" class="btn btn-sm ' + btn_status + '" onclick="_action_.show_data(\''+ Object.values(i)[0].description + '\',\'' + Object.values(i)[0].duration + '\',\'' + escape(Object.values(i)[0].exception) + '\',\'' + escape(Object.values(i)[0].batch_count) + '\',\'' + escape(Object.values(i)[0].session) + '\',\'' + escape(Object.values(i)[0].timestamp) + '\',\'' + escape(Object.values(i)[0].starttime) + '\',\'' + escape(Object.values(i)[0].endtime) + '\');" >' + Object.keys(i) + '</button>';
+                            d += '</div>';
+                        });
+                        d += '</div>'
+                        return d;
+                    }
+                },
+            ]
+        } );
+
+        $('[data-toggle="popover"]').popover();
+    } );
+
+
+    // reload server data table
+    var detail_interval = setInterval( function () {
+         $('#server_details').DataTable().ajax.reload(null, false).draw();
+    }, 10000 );
+
+    // reload action status
+    var action_status = setInterval( function () {
+        $.getJSON({
+            url: 'status/',
+        }).done(function(data){
+            $("#basic_logs").empty();
+            $.each(data.display, function(k, tupple){
+                $.each(tupple, function(key, value){
+                    $("#basic_logs").append("<li class='" + key + "'>" + value + "</li>");
+                });
+            });
+            if($("#action_status").text() != data.status){
+                $("#action_status").text(data.status);
+                $("#action_status").removeClass("label-default");
+                $("#action_status").addClass("label-primary");
+            }
+        });
+    }, 5000 );
+
+    // stop auto reload once action is over
+    var task_closure = ['COMPLETED', 'FAILED', 'REVOKED', 'WAITING'];
+
+    var check_ui = setInterval(function(){
+        if($.inArray($("#action_status").text(), task_closure) >= 0) {
+            window.clearInterval(detail_interval);
+            window.clearInterval(action_status);
+            $("#revoke").hide();
+            $(".progress").hide();
+        }
+    }, 10000);
+
+</script>
+{% else %}
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('#action_details').DataTable({
+            "order": [[ 0, "desc" ]],
+        });
+    });
+</script>
+{% endif %}
+{% endblock %}

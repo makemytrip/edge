@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block active_wizard %}menu-select{% endblock %}
+
+{% block body %}
+    <form method="post">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">{{ action|title }} {{ obj|title }}</h3>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-8">
+                            {% for field in form %}
+                                <div class="form-group">
+                                    <label for="field.label_tag">{{ field.label_tag }}</label>
+                                    {{ field }}
+                                </div>
+                            {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <button class="btn btn-success" type="submit" name="action" value="{{ action }}" onclick="return _wizard_.validate();">{{ action|title }}</button>
+            </div>
+        </div>
+    </form>
+{% endblock %}

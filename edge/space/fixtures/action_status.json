@@ -1,0 +1,58 @@
+[
+	{
+		"model": "space.ActionStatus",
+		"pk": 1,
+		"fields": {
+			"name": "BUILDING"
+		}
+	},
+	{
+		"model": "space.ActionStatus",
+		"pk": 2,
+		"fields": {
+			"name": "SCHEDULED"
+		}
+	},
+	{
+		"model": "space.ActionStatus",
+		"pk": 3,
+		"fields": {
+			"name": "INPROGRESS"
+		}
+	},
+	{
+		"model": "space.ActionStatus",
+		"pk": 4,
+		"fields": {
+			"name": "FAILED"
+		}
+	},
+	{
+		"model": "space.ActionStatus",
+		"pk": 5,
+		"fields": {
+			"name": "REVOKED"
+		}
+	},
+	{
+		"model": "space.ActionStatus",
+		"pk": 6,
+		"fields": {
+			"name": "COMPLETED"
+		}
+	},
+	{
+		"model": "space.ActionStatus",
+		"pk": 7,
+		"fields": {
+			"name": "WAITING"
+		}
+	},
+	{
+		"model": "space.ActionStatus",
+		"pk": 8,
+		"fields": {
+			"name": "MANUAL_FAILED"
+		}
+	}
+]

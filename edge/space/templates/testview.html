@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block user_info %}
+    <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+    {{ user|upper }}
+{% endblock %}
+
+{% block body %}
+    <p> Session = {{ request.session}} </p>
+    <p> Session Key = {{ request.session.session_key }} </p>
+
+{% endblock %}

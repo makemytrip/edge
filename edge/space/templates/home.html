@@ -1,0 +1,250 @@
+{% extends 'base.html' %} {% load staticfiles %} {% block body %}
+
+<div class="row">
+    {% for space, action in space_info.items %}
+    <div class="col-md-2">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                {{ space|upper }}
+                <a class="btn btn-xs btn-default pull-right" href="/report/{{ space }}/" role="button">
+                    <span class="glyphicon glyphicon-level-up" aria-hidden="true"></span>
+                </a>
+            </div>
+            <div class="panel-footer">
+                <div class="btn-group" role="group" aria-label="...">
+                    <a href="/space/action/{{ space }}" class="btn btn-success btn-xs">
+                        <span class="glyphicon glyphicon-equalizer" aria-hidden="true"></span>
+                        Actions {{ action.0 }}
+                    </a>
+                    <a href="/space/{{ space }}" class="btn btn-info btn-xs">
+                        Projects {{ action.1 }}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="panel-group" id="accordion">
+    <div class="panel panel-primary">
+        <a data-toggle="collapse" href="#collapse1" style="text-decoration: none;color:black;">
+            <div class="panel-heading">
+                <h2 id="dendro_title" class="panel-title">
+                    Loading Dendrogram..Please Wait
+                </h2>
+            </div>
+        </a>
+        <div id="collapse1" class="panel-collapse collapse">
+            <div class="panel-body" id="dendo_body"></div>
+        </div>
+    </div>
+</div>
+
+{% endblock %} {% block postcustomjs %}
+<script type="text/javascript">
+    // $('#accordion').on('show.bs.collapse', function () {
+        
+    // });
+
+    $(document).ready(function () {
+        var dendoPromise = new Promise(function (resolve, reject) {
+            $.ajax({
+                url: "/space/loadDendrogram",
+                success: function (data) {
+                    resolve(data.space_dendro_info);
+
+                },
+                error: function (jqXHR, exception) {
+                    console.log(jqXHR);
+                }
+            });
+
+
+        }).then(function (response) {
+            console.log("Response " + response);
+            var dendo = loadDendroData(response);
+            renderDendro(dendo);
+            document.getElementById("dendro_title").innerHTML = "MMT Applications Dendrogram";
+        })
+
+
+    });
+
+
+
+    loadDendroData = (space_dendro_info) => {
+
+        var dendro_array = [];
+        var dendro_arr = [];
+        for (let space in space_dendro_info) {
+            dendro_arr = [];
+            for (project_name in space_dendro_info[space]) {
+                project_info = space_dendro_info[space][project_name];
+                var dendro_versions = [];
+                for (version in project_info) {
+                    var dendro_servers = [];
+                    var project_server = project_info[version];
+                    var dendro_items = [];
+                    for (server in project_server) {
+                        dendro_servers.push({ 'name': project_server[server] });
+                    }
+                    dendro_versions.push({ 'name': version, "children": dendro_servers })
+                }
+                dendro_arr.push({ 'name': project_name, "children": dendro_versions })
+            }
+            dendro_array.push({ 'name': space, "children": dendro_arr })
+        }
+        dendo = { "name": "MMT", "children": dendro_array }
+
+        return dendo
+
+    }
+
+    renderDendro = (dendo) => {
+        console.log(dendo);
+        document.getElementById("dendo_body").innerHTML = "";
+        var margin = { top: 20, right: 60, bottom: 20, left: 60 },
+            width = 1350 - margin.right - margin.left,
+            height = 800 - margin.top - margin.bottom;
+
+        var i = 0,
+            duration = 750,
+            root;
+
+        var tree = d3.layout.tree()
+            .size([height, width]);
+
+        var diagonal = d3.svg.diagonal()
+            .projection(function (d) { return [d.y, d.x]; });
+
+
+        
+        var svg = d3.select("#dendo_body").append("svg")
+            .attr("width", width + margin.right + margin.left)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    
+  
+
+        root = dendo;
+        root.x0 = height / 2;
+        root.y0 = 0;
+
+        function collapse(d) {
+            if (d.children) {
+                d._children = d.children;
+                d._children.forEach(collapse);
+                d.children = null;
+            }
+        }
+
+        root.children.forEach(collapse);
+        update(root);
+
+        d3.select(self.frameElement).style("height", "800px");
+
+
+        function update(source) {
+
+            // Compute the new tree layout.
+            var nodes = tree.nodes(root).reverse(),
+                links = tree.links(nodes);
+
+            // Normalize for fixed-depth.
+            nodes.forEach(function (d) { d.y = d.depth * 280; });
+
+            // Update the nodes…
+            var node = svg.selectAll("g.node")
+                .data(nodes, function (d) { return d.id || (d.id = ++i); });
+
+            // Enter any new nodes at the parent's previous position.
+            var nodeEnter = node.enter().append("g")
+                .attr("class", "node")
+                .attr("transform", function (d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
+                .on("click", click);
+
+            nodeEnter.append("circle")
+                .attr("r", 1e-6)
+                .style("fill", function (d) { return d._children ? "lightsteelblue" : "#fff"; });
+
+            nodeEnter.append("text")
+                .attr("x", function (d) { return d.children || d._children ? -10 : 10; })
+                .attr("dy", ".35em")
+                .attr("text-anchor", function (d) { return d.children || d._children ? "end" : "start"; })
+                .text(function (d) { return d.name; })
+                .style("fill-opacity", 1e-6);
+
+            // Transition nodes to their new position.
+            var nodeUpdate = node.transition()
+                .duration(duration)
+                .attr("transform", function (d) { return "translate(" + d.y + "," + d.x + ")"; });
+
+            nodeUpdate.select("circle")
+                .attr("r", 4.5)
+                .style("fill", function (d) { return d._children ? "lightsteelblue" : "#fff"; });
+
+            nodeUpdate.select("text")
+                .style("fill-opacity", 1);
+
+            // Transition exiting nodes to the parent's new position.
+            var nodeExit = node.exit().transition()
+                .duration(duration)
+                .attr("transform", function (d) { return "translate(" + source.y + "," + source.x + ")"; })
+                .remove();
+
+            nodeExit.select("circle")
+                .attr("r", 1e-6);
+
+            nodeExit.select("text")
+                .style("fill-opacity", 1e-6);
+
+            // Update the links…
+            var link = svg.selectAll("path.link")
+                .data(links, function (d) { return d.target.id; });
+
+            // Enter any new links at the parent's previous position.
+            link.enter().insert("path", "g")
+                .attr("class", "link")
+                .attr("d", function (d) {
+                    var o = { x: source.x0, y: source.y0 };
+                    return diagonal({ source: o, target: o });
+                });
+
+            // Transition links to their new position.
+            link.transition()
+                .duration(duration)
+                .attr("d", diagonal);
+
+            // Transition exiting nodes to the parent's new position.
+            link.exit().transition()
+                .duration(duration)
+                .attr("d", function (d) {
+                    var o = { x: source.x, y: source.y };
+                    return diagonal({ source: o, target: o });
+                })
+                .remove();
+
+            // Stash the old positions for transition.
+            nodes.forEach(function (d) {
+                d.x0 = d.x;
+                d.y0 = d.y;
+            });
+        }
+
+        // Toggle children on click.
+        function click(d) {
+            if (d.children) {
+                d._children = d.children;
+                d.children = null;
+            } else {
+                d.children = d._children;
+                d._children = null;
+            }
+            update(d);
+        }
+    };
+
+</script> {% endblock %}

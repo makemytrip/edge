@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block active_report %}menu-report{% endblock %}
+
+{% block customcss %}
+.edge-nav-color {
+    background: -moz-linear-gradient(right,{{space.nav_color}} 20%,#ffffff) fixed no-repeat 0 100%;
+    background: {{space.nav_color}};
+}
+{% endblock %}
+
+{% block body %}
+
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h3 class="panel-title">{{ action|title }} {{ obj|title }}</h3>
+    
+  	
+		<div class="dropdown">
+			<button class="btn btn-xs btn-default dropdown-toggle" type="button" id="project" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+				Projects in {{ space.name|upper }}
+				<span class="caret"></span>
+			</button>
+
+			<ul class="dropdown-menu" aria-labelledby="project">
+				{% for project in project_list %}
+					<li><a href="/space/report/{{ space.name }}/{{ project.name }}">{{ project.name }}</a></li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+	<div class="panel-body">
+
+		{% if action_info_list %}
+	        <table id="action_details" class="table table-striped">
+	            <thead>
+	            <tr>
+	                <th>#</th>
+	                <th>Project</th>
+	                <th>Env.</th>
+	                <th>Action</th>
+	                <th>Timestamp</th>
+	                <th>User</th>
+	            </tr>
+	            </thead>
+	            {% for action_info in action_info_list %}
+	            <tr>
+	                <td>{{ action_info.id }}</td>
+	                <td>{{ action_info.project|title }}</td>
+	                <td>{{ action_info.project.env.name }}</td>
+	                <td><mark>{{ action_info.action|title }}</mark></td>
+	                <td>{{ action_info.timestamp }}</td>
+	                <td>{{ action_info.user|upper }}</td>
+	            </tr>
+	            {% endfor %}
+	        </table>
+	    {% endif %}
+	</div>
+</div>
+{% endblock %}
+
+{% block postcustomjs %}
+<script type="text/javascript">
+	$(document).ready(function(){
+    	$('#action_details').DataTable({
+    		"order": [[ 0, "desc" ]],
+    		'paging': false
+    	});
+	});
+</script>
+{% endblock %}

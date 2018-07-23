@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block active_space %}menu-select{% endblock %}
+
+{% block customcss %}
+.edge-nav-color {
+    background: -moz-linear-gradient(right,{{space.nav_color}} 20%,#ffffff) fixed no-repeat 0 100%;
+    background: {{space.nav_color}};
+}
+
+{% endblock %}
+
+{% block body %}
+
+{% with request.session.space_permissions|get_item:space.name|get_item:'admin' as is_admin %}
+{% with request.session.space_permissions|get_item:space.name|get_item:'operator' as is_operator %}
+<form class="form-inline" method="post">
+    <div class="panel panel-primary">
+        <div class="panel-heading">{{ action|title }} plan for {{ project.name|title }}
+            <a class="btn btn-xs btn-default pull-right" href="/space/{{ space }}/" role="button">
+                <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+                Back to Space: {{ space|title }}
+            </a>
+        </div>
+        <div class="panel-body" style="max-height: 500px;overflow-y: scroll;">
+            {% for pool in server_info %}
+                <table class="table table-striped table-bordered">
+                <tr>
+                <td><button type="button" class="btn btn-info btn-sm btn-block" onclick="_plan_.select_servers('pool', this.innerHTML);">{{ pool.pool|get_item:'pool_name' }}</button></td>
+                <td><button type="button" class="btn btn-info btn-sm btn-block" disabled>Config Version</button></td>
+                <td><button type="button" class="btn btn-info btn-sm btn-block" disabled>Live Version</button></td>
+                </tr>
+                        {% for server in pool.servers %}
+                            {% if project_details|get_item:server == project.total_config_dict|get_item:'version' %}
+                                <tr class="success">
+                                <td><input name="servers" id="server" value={{ server }} pool="{{ pool.pool|get_item:'pool_name'}}" type="checkbox">{{ server }}</input></td>
+                            {% else %}
+                                <tr class="danger">
+                                <td><input name="servers" category="danger_server" value={{ server }} pool="{{ pool.pool|get_item:'pool_name'}}" type="checkbox">{{ server }}</input></td>
+                            {% endif %}
+                            <td>{{project.total_config_dict|get_item:'version'}}</td>
+                            <td> {{ project_details|get_item:server}} </td>
+                        {% endfor %}
+                </tr>
+                </table>
+            {% endfor %}
+        </div>
+        <div class="panel-footer">
+            {% if action != 'delta' %}
+                <button class="btn btn-sm btn-info" type="button" name="toggle_checkboxes" value="{{ action }}" onclick="_plan_.select_servers('name', 'servers');">Toggle Selection</button>
+                <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#{{ project.name }}_default">
+                Config
+                </button>
+                {% if is_admin or is_operator %}
+                    <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#reasonModal">{{action|title}}</button>
+                {% endif %}
+                <button class="btn btn-sm btn-success" type="button" name="delta_checkboxes" value="delta" onclick="_plan_.select_servers('category', 'danger_server');">Toggle Delta</button>
+            {% endif %}
+            <!-- Reason Modal -->
+            <div class="modal fade" id="reasonModal" role="dialog">
+            <div class="modal-dialog">
+    
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Please specify reason ?</h4>
+                </div>
+            <div class="modal-body">
+                <textarea class='form-control' name="reason" style='min-width:100%;min-height:200px;padding:15px;color:gray' autofocus required="required"></textarea>
+            </div>
+            <div class="modal-footer">
+                {% if is_admin or is_operator %}
+                       <button class="btn btn-sm btn-danger" type="submit" name="action" value="{{ action }}" onclick="return _plan_.is_servers();">{{ action|title }}</button>
+                {% endif %}
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+            </div>
+      
+            </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endwith %}
+{% endwith %}
+
+<div class="modal fade" id="{{ project.name }}_default" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myModalLabel">{{ project.name|title }}: Config</h5>
+            </div>
+            <div class="modal-body">
+                <pre>{{ project.total_config_dict|get_json }}</pre>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

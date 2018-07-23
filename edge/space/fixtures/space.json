@@ -1,0 +1,22 @@
+[
+	{
+		"model": "space.Space",
+			"pk": 1,
+			"fields": {
+				"name": "devops",
+				"admin_dl": "scm-devops@makemytrip.com",
+				"operator_dl": "webops@makemytrip.com",
+				"nav_color": "#f9ff39"
+			}
+	},
+	{
+		"model": "space.Space",
+			"pk": 2,
+			"fields": {
+				"name": "webops",
+				"admin_dl": "scm-devops@makemytrip.com",
+				"operator_dl": "scm-devops@makemytrip.com",
+				"nav_color": "#f9ff39"
+			}
+	}
+]

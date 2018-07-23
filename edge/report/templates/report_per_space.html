@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block active_report %}menu-select{% endblock %}
+
+{% block customcss %}
+.edge-nav-color {
+    background: -moz-linear-gradient(right,{{space.0.nav_color}} 20%,#ffffff) fixed no-repeat 0 100%;
+    background: {{space.0.nav_color}};
+}
+{% endblock %}
+
+{% block body %}
+<div class="panel panel-success">
+	<div class="panel-heading">
+        Edge Reports, last {{ s_days }} day(s)
+        <div class="btn-toolbar pull-right" role="toolbar" aria-label="nav_button">
+            <div class="btn-group" role="group" aria-label="nav_button">
+                <a class="btn btn-xs btn-default" href="/space/{{ space.0.name }}" role="button">
+                    <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+                    Back to Space: {{ space.0.name|title }}
+                </a>
+            </div>
+        </div>
+	</div>
+	<div class="panel-body">
+
+        <form class="form-inline" method="get">
+            <div class="form-group">
+                <select id="search-project" name="project" multiple="multiple">
+                    {% for project in project_list %}
+                        <option value="{{ project }}" {% if project in search_project %} selected="selected" {% endif %}>{{ project }}</option>
+                    {% endfor %}
+                </select>
+                <select id="search-plan" name="plan" multiple="multiple">
+                    {% for plan in plan_list %}
+                        <option value="{{ plan }}" {% if plan in search_plan %} selected="selected" {% endif %}>{{ plan }}</option>
+                    {% endfor %}
+                </select>
+                <select id="search-status" name="status" multiple="multiple">
+                    {% for status in status_list %}
+                        <option value="{{ status }}"  {% if status in search_status %} selected="selected" {% endif %}>{{ status }}</option>
+                    {% endfor %}
+                </select>
+                <select id="search-user" name="user" multiple="multiple">
+                    {% for user in user_list %}
+                        <option value="{{ user }}"  {% if user.username in search_user %} selected="selected" {% endif %}>{{ user.first_name }} {{ user.last_name }}</option>
+                    {% endfor %}
+                </select>
+                <select id="search-days" name="days">
+                    {% for day in days %}
+                        <option value="{{ day }}"  {% if day|get_int == s_days %} selected="selected" {% endif %}>{{ day }} days</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-default">Search</button>
+            </div>
+        </form>
+        {% if action_info_list %}
+	        <table id="action_details" class="table table-bordered report">
+	            <thead>
+	            <tr>
+	                <th>#</th>
+                    <th>Space</th>
+	                <th>Project</th>
+	                <th>Env.</th>
+	                <th>Action</th>
+                    <th>Version</th>
+                    <th>Jira</th>
+	                <th>Timestamp</th>
+                    <th>Status</th>
+	                <th>User</th>
+	            </tr>
+	            </thead>
+	            {% for action_info in action_info_list %}
+	            <tr>
+	                <td><a href="/space/action/{{ action_info.project.space.name }}/{{action_info.id}}" target="_blank">{{ action_info.id }}</a></td>
+                    <td>{{ action_info.project.space.name }}</td>
+	                <td>{{ action_info.project|title }}</td>
+	                <td>{{ action_info.project.env.name }}</td>
+	                <td><mark>{{ action_info.action|title|replace_char }}</mark></td>
+                    <td>{{ action_info.config_dict|get_item:'version' }}</td>
+                    <td>{{ action_info.config_dict|get_item:'jira_id' }}</td>
+	                <td>{{ action_info|get_action_time }}</td>
+                    <td>{{ action_info.status.name }}</td>
+	                <td>{{ action_info.user.first_name }} {{ action_info.user.last_name }}</td>
+	            </tr>
+	            {% endfor %}
+	        </table>
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span>
+                Wow !!! such empty here.
+            </div>
+	    {% endif %}
+	</div>
+</div>
+{% endblock %}
+
+{% block postcustomjs %}
+<script type="text/javascript">
+	$(document).ready(function(){
+    	$('#action_details').DataTable({
+    		"order": [[ 0, "desc" ]],
+    		'paging': false,
+            'searching': false
+    	});
+        $('#search-project').multiselect({
+            includeSelectAllOption: true,
+            selectAllText: 'Check all!',
+            selectAllValue: 'all',
+            enableFiltering: true,
+            maxHeight: 400,
+            enableCaseInsensitiveFiltering: true,
+            nonSelectedText: 'Projects'
+        });
+        $('#search-plan').multiselect({
+            includeSelectAllOption: true,
+            selectAllText: 'Check all!',
+            selectAllValue: 'all',
+            nonSelectedText: 'Plan'
+        });
+        $('#search-status').multiselect({
+            includeSelectAllOption: true,
+            selectAllText: 'Check all!',
+            selectAllValue: 'all',
+            nonSelectedText: 'Status'
+        });
+        $('#search-user').multiselect({
+            includeSelectAllOption: true,
+            enableFiltering: true,
+            enableCaseInsensitiveFiltering: true,
+            selectAllText: 'Check all!',
+            selectAllValue: 'all',
+            maxHeight: 400,
+            nonSelectedText: 'User'
+        });
+        $('#search-days').multiselect();
+	});
+</script>
+{% endblock %}
